@@ -1,0 +1,44 @@
+# Build
+/build/
+/out/
+cmake-build-*/
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Android
+android/**/.gradle/
+android/**/build/
+android/local.properties
+*.aar
+
+# NDK / external native build output
+.cxx/
+android/**/.cxx/
+
+# iOS
+ios/build/
+*.xcframework
+Pods/
+
+# Flutter / RN
+flutter/**/.dart_tool/
+flutter/**/build/
+react-native/**/node_modules/
+
+# Docs
+docs/html/
+docs/xml/
