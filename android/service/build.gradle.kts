@@ -1,18 +1,14 @@
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     id("org.jetbrains.kotlin.android")
 }
 
 android {
-    namespace = "com.glancehud.example"
+    namespace = "com.glancehud.service"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.glancehud.example"
-        minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = 24  // Android 7.0 — matches the core library.
     }
 
     sourceSets["main"].java.srcDirs("src/main/kotlin")
@@ -33,6 +29,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":"))         // the GlanceHUD library (root project)
-    implementation(project(":service"))  // optional persistent (foreground-service) mode
+    // Opt-in add-on to the core library: pull this in only if you need the
+    // overlay to survive the host app going to the background.
+    implementation(project(":"))
+    implementation("androidx.core:core-ktx:1.13.1")
 }

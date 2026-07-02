@@ -23,3 +23,6 @@ rootProject.name = "glancehud-android"
 
 // The library is the root project; the example app is a child module.
 include(":example")
+
+// Optional foreground-service add-on (GlancePersistentHud).
+include(":service")

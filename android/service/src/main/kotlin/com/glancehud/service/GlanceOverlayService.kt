@@ -1,4 +1,4 @@
-package com.glancehud
+package com.glancehud.service
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -8,18 +8,21 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import com.glancehud.GlanceHud
 
 /**
  * Hosts the overlay from a foreground service so it survives the host app going
- * to the background or being killed. Started via [GlanceHud.startPersistent].
+ * to the background or being killed. Started via [GlancePersistentHud.start].
  *
  * A foreground service needs an ongoing notification; on API 34+ it must also
  * declare a foreground service type (here: "special use", the correct bucket for
  * a developer diagnostics overlay).
+ *
+ * The overlay window itself is owned by [GlanceHud] (a system-level
+ * TYPE_APPLICATION_OVERLAY window, independent of this service's lifecycle);
+ * this service only keeps the process alive and drives show/hide.
  */
 class GlanceOverlayService : Service() {
-
-    private var manager: GlanceOverlayManager? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -27,16 +30,13 @@ class GlanceOverlayService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (manager == null) {
-            manager = GlanceOverlayManager(applicationContext, GlanceHud.currentConfig())
-        }
-        manager?.show()
+        GlanceHud.start()  // ensure sampling is running
+        GlanceHud.show()
         return START_STICKY
     }
 
     override fun onDestroy() {
-        manager?.hide()
-        manager = null
+        GlanceHud.stop()
         super.onDestroy()
     }
 

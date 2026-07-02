@@ -4,19 +4,10 @@
     <!-- Float the overlay over the whole device (granted at runtime). -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <!-- Keep the overlay alive when the host app is backgrounded/killed. -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-
-    <application>
-        <service
-            android:name="com.glancehud.GlanceOverlayService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="glancehud-developer-overlay" />
-        </service>
-    </application>
+    <!--
+      The foreground-service permissions and <service> declaration live in the
+      optional :service module, so apps that only use the attached overlay don't
+      inherit them. Add com.glancehud.service (GlancePersistentHud) to opt in.
+    -->
 
 </manifest>

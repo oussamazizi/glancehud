@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.core.content.ContextCompat
 
 /**
  * Public entry point for GlanceHUD on Android.
@@ -21,6 +20,9 @@ import androidx.core.content.ContextCompat
  *
  * The heavy lifting (sampling thread, FPS math) happens in the shared C++ core;
  * this object only bridges to it and manages the native overlay window.
+ *
+ * To keep the overlay alive when the host app is backgrounded, add the optional
+ * `:service` module and use `GlancePersistentHud` from `com.glancehud.service`.
  */
 object GlanceHud {
 
@@ -29,14 +31,11 @@ object GlanceHud {
     }
 
     private var manager: GlanceOverlayManager? = null
-    private var appContext: Context? = null
     private var config: GlanceConfig = GlanceConfig()
-    private var serviceMode = false
 
     /** Configure the engine and prepare the overlay. Call once, early. */
     fun initialize(context: Context, config: GlanceConfig = GlanceConfig()) {
         this.config = config
-        this.appContext = context.applicationContext
         nativeInitialize(config.sampleIntervalMs, config.opacity, config.autoShow, config.startCollapsed)
         manager = GlanceOverlayManager(context.applicationContext, config)
     }
@@ -47,33 +46,11 @@ object GlanceHud {
         if (config.autoShow) manager?.show()
     }
 
-    /**
-     * Start sampling with the overlay hosted by a foreground service, so it
-     * survives the host app going to the background or being killed.
-     * Requires the overlay permission (see [hasOverlayPermission]).
-     */
-    fun startPersistent(context: Context) {
-        nativeStart()
-        serviceMode = true
-        ContextCompat.startForegroundService(
-            context,
-            Intent(context, GlanceOverlayService::class.java),
-        )
-    }
-
-    /** Stop sampling and remove the overlay (whichever mode was used). */
+    /** Stop sampling and remove the overlay. */
     fun stop() {
-        if (serviceMode) {
-            appContext?.let { it.stopService(Intent(it, GlanceOverlayService::class.java)) }
-            serviceMode = false
-        } else {
-            manager?.hide()
-        }
+        manager?.hide()
         nativeStop()
     }
-
-    /** The active configuration (used by the overlay service). */
-    internal fun currentConfig(): GlanceConfig = config
 
     fun show() = manager?.show()
     fun hide() = manager?.hide()

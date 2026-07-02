@@ -50,6 +50,30 @@ GlanceHud.stop()    // stops sampling + removes the overlay
 > ⚠️ Ship GlanceHUD in **debug builds only**. It requests `SYSTEM_ALERT_WINDOW`
 > and is a development tool.
 
+### Persistent mode (optional)
+
+By default the overlay lives as long as your app is in the foreground. To keep it
+alive when the app is backgrounded or killed, add the optional `:service` module
+and drive it with `GlancePersistentHud`:
+
+```kotlin
+dependencies {
+    implementation(project(":"))         // core library
+    implementation(project(":service"))  // opt-in foreground-service add-on
+}
+```
+
+```kotlin
+import com.glancehud.service.GlancePersistentHud
+
+GlancePersistentHud.start(context)  // hosts the overlay in a foreground service
+// ...
+GlancePersistentHud.stop(context)
+```
+
+Only this module pulls in the `FOREGROUND_SERVICE` / `FOREGROUND_SERVICE_SPECIAL_USE`
+permissions and the ongoing notification — apps that don't use it stay clean.
+
 ## Build
 
 Requires Android Studio (or the Android SDK + NDK + CMake). From `android/`:
@@ -68,4 +92,4 @@ installs only the matching one.
 - ✅ JNI bridge, CPU & RAM providers, FPS via Choreographer
 - ✅ Draggable / collapsible native overlay
 - ⬜ GPU time and network providers (planned)
-- ⬜ Persistent overlay across process/activity changes (foreground service)
+- ✅ Persistent overlay across process/activity changes (optional `:service` module)

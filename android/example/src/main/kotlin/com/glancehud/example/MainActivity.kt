@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.glancehud.GlanceConfig
 import com.glancehud.GlanceHud
+import com.glancehud.service.GlancePersistentHud
 
 /**
  * Minimal demo: grant the overlay permission, then start/stop GlanceHUD.
@@ -17,6 +18,7 @@ import com.glancehud.GlanceHud
 class MainActivity : Activity() {
 
     private var running = false
+    private var persistent = false
     private lateinit var toggleButton: Button
     private lateinit var status: TextView
 
@@ -75,8 +77,9 @@ class MainActivity : Activity() {
             GlanceHud.requestOverlayPermission(this)
             return
         }
-        GlanceHud.startPersistent(this)
+        GlancePersistentHud.start(this)
         running = true
+        persistent = true
         toggleButton.text = "Stop overlay"
         status.text = "Persistent overlay running — try pressing Home."
     }
@@ -90,17 +93,27 @@ class MainActivity : Activity() {
         running = !running
         if (running) {
             GlanceHud.start()
+            persistent = false
             toggleButton.text = "Stop overlay"
             status.text = "Overlay running — drag it, tap to collapse."
         } else {
-            GlanceHud.stop()
+            stopOverlay()
             toggleButton.text = "2) Start overlay"
             status.text = "Overlay stopped"
         }
     }
 
+    private fun stopOverlay() {
+        if (persistent) {
+            GlancePersistentHud.stop(this)
+            persistent = false
+        } else {
+            GlanceHud.stop()
+        }
+    }
+
     override fun onDestroy() {
-        GlanceHud.stop()
+        stopOverlay()
         super.onDestroy()
     }
 }
